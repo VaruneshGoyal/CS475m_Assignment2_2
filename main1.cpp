@@ -29,6 +29,8 @@ HNode *pedal_rod_across;
 HNode *axle;
 HNode *across_gear;
 
+HNode *room;
+
 
 HNode *handle_connect_with_frame, *handle_connect_front_wheel_across, 
       *handle_connect_front_wheel_left, *handle_connect_front_wheel_right,
@@ -145,7 +147,7 @@ void init(void){
   // Setup the view of the cube.
   glMatrixMode(GL_PROJECTION);
   //gluPerspective(field of view in degree, aspect ratio, Z near, Z far);
-  gluPerspective(80.0, 1.0, 1.0, 200.0);
+  gluPerspective(80.0, 1.0, 1.0, 1000.0);
 
   glMatrixMode(GL_MODELVIEW);
   gluLookAt(0.0, 0.0, 100.0,  // eye is at (0,0,8)
@@ -158,13 +160,24 @@ int main(int argc, char **argv)
 
   // of the first node - vetical cylinder containing the front handle
   node[0] = new HNode(NULL);
+  node[1] = new HNode(NULL);
   
+  room = new HNode(NULL);
+  node[0]->add_child(room);
+
+  wheel_axis_f = new HNode(NULL);
+  wheel_axis_b = new HNode(NULL);
+ 
+  node[0]->add_child(wheel_axis_b);
+  wheel_axis_b->add_child(node[1]);
+
   frame[0] = new HNode(NULL);
-  node[0]->add_child(frame[0]);
+  node[1]->add_child(frame[0]);
 
   wheel_front = new HNode(NULL);
+  wheel_front->add_child(wheel_axis_f);
   wheel_back = new HNode(NULL);
-  node[0]->add_child(wheel_back);
+  node[1]->add_child(wheel_back);
 
   for(int i=0; i<9; i++){
     spoke_back[i] = new HNode(NULL);
@@ -187,14 +200,9 @@ int main(int argc, char **argv)
     spoke_front2[i]->add_child(spoke_front2_extra[i]);
   }
 
-  wheel_axis_f = new HNode(NULL);
-  wheel_axis_b = new HNode(NULL);
-  wheel_front->add_child(wheel_axis_f);
-  wheel_back->add_child(wheel_axis_b);
-
   //handle
   handle_connect_with_frame = new HNode(NULL);
-  node[0]->add_child(handle_connect_with_frame);
+  node[1]->add_child(handle_connect_with_frame);
 
   handle_connect_front_wheel_across = new HNode(NULL);
   handle_connect_front_wheel_across->add_child(wheel_front);
@@ -212,6 +220,14 @@ int main(int argc, char **argv)
   handlebar_right = new HNode(NULL);
   handlebar_connector_across->add_child(handlebar_left);
   handlebar_connector_across->add_child(handlebar_right);
+
+  //room
+  room->obj_type = 1;
+  room->cuboid_height = 1000;
+  room->cuboid_breadth = 1000;
+  room->cuboid_length = 1000;
+  room->change_parameters(-room->cuboid_length/2, 0, -room->cuboid_breadth/2, 0,0,0);
+  room->set_color(1,0.8,0.1);
 
   //front wheel...this is child of handle_with_wheel_across!
   wheel_front->obj_type = 2;
@@ -327,7 +343,8 @@ int main(int argc, char **argv)
   wheel_axis_b->height=wheel_axis_length;
   wheel_axis_b->slices=50;
   wheel_axis_b->stacks=10;
-  wheel_axis_b->change_parameters(0,0,-wheel_axis_length/2,0,0,0);
+  wheel_axis_b->change_parameters(50,wheel_outer_radius,0,0,0,0);
+  node[1]->change_parameters(-50,0, wheel_axis_length/2,0,0,0);
 
   //handle of the cycle
   handle_connect_with_frame->obj_type=0;
@@ -336,7 +353,7 @@ int main(int argc, char **argv)
   handle_connect_with_frame->height=handle_connect_with_frame_length;
   handle_connect_with_frame->slices=50;
   handle_connect_with_frame->stacks=10;
-  handle_connect_with_frame->change_parameters(-30,26.5,0,-90,25,0);
+  handle_connect_with_frame->change_parameters(-30,24,0,-90,25,0);
   handle_connect_with_frame->set_color(1,0,0);    
 
   handlebar_connector->obj_type=0;
@@ -417,7 +434,7 @@ int main(int argc, char **argv)
   frame[0]->stacks=10;
   frame[0]->change_parameters(-25,40,0,-90,105,0);
   frame[0]->set_color(1,0,0);
-  node[0]->add_child(frame[0]);
+  node[1]->add_child(frame[0]);
 
   //frame[1] = frame_lower_horizontal
   frame[1] = new HNode(NULL);
@@ -453,7 +470,7 @@ int main(int argc, char **argv)
   frame[3]->stacks=10;
   frame[3]->change_parameters(22,28,0,-90,135,0);
   frame[3]->set_color(1,0,0);
-  node[0]->add_child(frame[3]);
+  node[1]->add_child(frame[3]);
 
   //axle
   axle = new HNode(NULL);
@@ -495,7 +512,7 @@ int main(int argc, char **argv)
   seat[0]->triangle_y2=30;
   seat[0]->change_parameters(10,23,0,0,0,0);
   seat[0]->set_color(0,0,0);
-  node[0]->add_child(seat[0]);
+  node[1]->add_child(seat[0]);
 
   seat[1] = new HNode(NULL);
   seat[1]->obj_type=3;
@@ -505,7 +522,7 @@ int main(int argc, char **argv)
   seat[1]->triangle_y2=26;
   seat[1]->change_parameters(10,23,0,0,0,0);
   seat[1]->set_color(0,0,0);
-  node[0]->add_child(seat[1]);
+  node[1]->add_child(seat[1]);
 
   //gear
   gear[0] = new HNode(NULL);
@@ -516,9 +533,9 @@ int main(int argc, char **argv)
   gear[0]->nsides=10;
   gear[0]->rings=50;
   gear[0]->set_color(0.6, 0.6, 0.6);
-  node[0]->add_child(gear[0]);
-  node[0]->add_child(frame[1]);
-  node[0]->add_child(frame[2]);
+  node[1]->add_child(gear[0]);
+  node[1]->add_child(frame[1]);
+  node[1]->add_child(frame[2]);
 
   gear[1] = new HNode(NULL);
   gear[1]->obj_type=2;
@@ -617,7 +634,7 @@ int main(int argc, char **argv)
   frame[6]->height=frame_lower_right_horizontal_len;
   frame[6]->change_parameters(15,0,across_gear_length-bar_radius,0,90-4,0);
   frame[6]->set_color(1,0,0);
-  node[0]->add_child(frame[6]);
+  node[1]->add_child(frame[6]);
 
   //frame lower right horizontal -- back
   frame[7] = new HNode(NULL);
@@ -627,7 +644,7 @@ int main(int argc, char **argv)
   frame[7]->height=frame_lower_right_horizontal_len;
   frame[7]->change_parameters(15,0,-across_gear_length+bar_radius,0,90+4,0);
   frame[7]->set_color(1,0,0);
-  node[0]->add_child(frame[7]);
+  node[1]->add_child(frame[7]);
 
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
