@@ -23,7 +23,6 @@ private:
   //1 - cuboid
   //2 - torus
   //3 - triangle
-  //4 - quad
 
 public:
 
@@ -67,7 +66,6 @@ public:
   // void make_cylinder();
   // void make_torus();
 
-  //void texMap_init(char* filename1);
   int loadBMP_custom(const char * imagepath);
   
   //increment/decrement parameters

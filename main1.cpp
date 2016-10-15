@@ -7,129 +7,6 @@
 
 using namespace std;
 
-//texture id
-//GLuint texture;
-
-// //image type to load the texture
-// struct Image {
-//     unsigned long sizeX;
-//     unsigned long sizeY;
-//     char *data;
-// };
-
-// typedef struct Image Image;
-
-// //function to read the data from the image
-// int ImageLoad(char *filename, Image *image) {
-//     FILE *file;
-//     unsigned long size; // size of the image in bytes.
-//     unsigned long i; // standard counter.
-//     unsigned short int planes; // number of planes in image (must be 1)
-//     unsigned short int bpp; // number of bits per pixel (must be 24)
-//     char temp; // temporary color storage for bgr-rgb conversion.
-//     // make sure the file is there.
-//     if ((file = fopen(filename, "rb"))==NULL){
-//         printf("File Not Found : %s\n",filename);
-//         return 0;
-//     }
-
-//     // seek through the bmp header, up to the width/height:
-//     fseek(file, 18, SEEK_CUR);
-
-//     // read the width
-//     if ((i = fread(&image->sizeX, 4, 1, file)) != 1) {
-//         printf("Error reading width from %s.\n", filename);
-//         return 0;
-//     }
-
-//     //printf("Width of %s: %lu\n", filename, image->sizeX);
-
-//     // read the height
-//     if ((i = fread(&image->sizeY, 4, 1, file)) != 1) {
-//         printf("Error reading height from %s.\n", filename);
-//         return 0;
-//     }
-
-//     //printf("Height of %s: %lu\n", filename, image->sizeY);
-
-//     // calculate the size (assuming 24 bits or 3 bytes per pixel).
-//     size = image->sizeX * image->sizeY * 3;
-
-//     // read the planes
-//     if ((fread(&planes, 2, 1, file)) != 1) {
-//         printf("Error reading planes from %s.\n", filename);
-//         return 0;
-//     }
-
-//     if (planes != 1) {
-//         printf("Planes from %s is not 1: %u\n", filename, planes);
-//         return 0;
-//     }
-
-//     // read the bitsperpixel
-//     if ((i = fread(&bpp, 2, 1, file)) != 1) {
-//         printf("Error reading bpp from %s.\n", filename);
-//         return 0;
-//     }
-
-//     if (bpp != 24) {
-//         printf("Bpp from %s is not 24: %u\n", filename, bpp);
-//         return 0;
-//     }
-
-//     // seek past the rest of the bitmap header.
-//     fseek(file, 24, SEEK_CUR);
-
-//     // read the data.
-//     image->data = (char *) malloc(size);
-
-//     if (image->data == NULL) {
-//         printf("Error allocating memory for color-corrected image data");
-//         return 0;
-//     }
-
-//     if ((i = fread(image->data, size, 1, file)) != 1) {
-//         printf("Error reading image data from %s.\n", filename);
-//         return 0;
-//     }
-
-//     for (i=0;i<size;i+=3) { // reverse all of the colors. (bgr -> rgb)
-//         temp = image->data[i];
-//         image->data[i] = image->data[i+2];
-//         image->data[i+2] = temp;
-//     }
-
-//     //fclose(filename);
-
-//     // we're done.
-//     return 1;
-// }
-
-// //function to load the texture - return an image object
-// Image * loadTexture(){
-//     Image *image1;
-
-//     // allocate space for texture
-//     image1 = (Image *) malloc(sizeof(Image));
-
-//     if (image1 == NULL) {
-//         printf("Error allocating space for image");
-//         exit(0);
-//     }
-
-//     char filename1[] = {'f', 'l', 'o', 'o', 'r', '.', 'b', 'm', 'p'};
-
-//     if (!ImageLoad(filename1, image1)) {
-//         cout<<"pain in image loading"<<endl;
-//         exit(1);
-//     }
-//     else{
-//         cout<<"image loaded"<<endl;
-//     }
-
-//     return image1;
-// }
-
 HNode *node[10];
 HNode *frame[8];
 HNode *wheel_front;
@@ -151,20 +28,18 @@ HNode *pedal_rod[2];
 HNode *pedal_rod_across;
 HNode *axle;
 HNode *across_gear;
+HNode *photoframe;
+HNode *photo_in_frame;
+HNode *headlight_cylinder;
+HNode *ceiling_lamp_connector;
+HNode *ceiling_lamp;
+HNode *ceiling_lamp_backcover;
 
 HNode *room[6];
-HNode *wall_frame;
-HNode *frame_pic;
 
 HNode *handle_connect_with_frame, *handle_connect_front_wheel_across, 
       *handle_connect_front_wheel_left, *handle_connect_front_wheel_right,
       *handlebar_connector, *handlebar_connector_across, *handlebar_left, *handlebar_right;
-
-//lighting and shading
-  GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
-  GLfloat light_diffuse[] = {0.8,0.8,0.8};
-  GLfloat light_specular[] = {1,1,1};
-  GLfloat light_ambient[] = {0.4,0.4,0.4};
 
 //static variables
   float wheel_outer_radius = 24;
@@ -193,6 +68,10 @@ HNode *handle_connect_with_frame, *handle_connect_front_wheel_across,
   float axle_length = 8;
   float across_gear_length = 4;
 
+  float room_height = 300;
+  float room_breadth = 600;
+  float room_length = 400;
+
 //dynamic variables  
   float handle_rotation = 0;
   float wheel_rotation = 0;
@@ -205,6 +84,13 @@ HNode *handle_connect_with_frame, *handle_connect_front_wheel_across,
 
   float delta_x, delta_l, l=80.0;
   float theta, theta_f, theta_f2;
+
+//lighting and shading
+  GLfloat light_position[] = { room_length/2, room_height-30, 0, 1};
+  GLfloat light_diffuse[] = {0.8,0.8,0.8};
+  GLfloat light_specular[] = {1,1,1};
+  GLfloat light_ambient[] = {0.4,0.4,0.4};
+  bool l0_status;
 
 //Our function for processing ASCII keys
 void processNormalKeys(unsigned char key, int x, int y) {
@@ -232,7 +118,16 @@ void processNormalKeys(unsigned char key, int x, int y) {
     case 'z':
       glRotatef(1,0,0,-1);
       glutPostRedisplay();
-      break;     
+      break;    
+    case 'L':
+      if(l0_status) glDisable(GL_LIGHT0);
+      else glEnable(GL_LIGHT0);
+      l0_status = !l0_status;
+      glutPostRedisplay();
+      break;
+    case 'H':
+      glutPostRedisplay();
+      break;
   }
   if (key == 27)
   exit(0);
@@ -292,10 +187,12 @@ void processSpecialKeys(int key, int x, int y) {
 
     case GLUT_KEY_LEFT:
       handle_connect_with_frame->rz++;
+      if(handle_connect_with_frame->rz > 90 || handle_connect_with_frame->rz < -90) handle_connect_with_frame->rz--;
       break;
 
     case GLUT_KEY_RIGHT:
       handle_connect_with_frame->rz--;
+      if(handle_connect_with_frame->rz > 90 || handle_connect_with_frame->rz < -90) handle_connect_with_frame->rz++;
       break;
   }
   //Redraw
@@ -320,8 +217,8 @@ void init(void){
   gluPerspective(80.0, 1.0, 1.0, 1000.0);
 
   glMatrixMode(GL_MODELVIEW);
-  gluLookAt(0.0, 5.0, 180.0,  // eye is at (0,0,8)
-  0.0, 0.0, 0.0,      // center is at (0,0,0)
+  gluLookAt(0, room_height/2, 180.0,  // eye is at (0,0,8)
+  0.0, room_height/2, 0.0,      // center is at (0,0,0)
   0.0, 1.0, 0.0);      // up is in positive Y direction
 
   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
@@ -392,6 +289,8 @@ int main(int argc, char **argv)
 
   handlebar_connector = new HNode(NULL);
   handle_connect_with_frame->add_child(handlebar_connector);
+  headlight_cylinder = new HNode(NULL);
+  handle_connect_with_frame->add_child(headlight_cylinder);
   handlebar_connector_across = new HNode(NULL);
   handlebar_connector->add_child(handlebar_connector_across);
   handlebar_left = new HNode(NULL);
@@ -399,80 +298,113 @@ int main(int argc, char **argv)
   handlebar_connector_across->add_child(handlebar_left);
   handlebar_connector_across->add_child(handlebar_right);
 
-// //room
-//   room->obj_type = 1;
-  float room_height = 500;
-  float room_breadth = 500;
-  float room_length = 500;
-//   room->change_parameters(-room->cuboid_length/2, 0, -room->cuboid_breadth/2, 0,0,0);
-//   room->set_color(1,0.8,0.1);
-
 //room
-  room[0]->obj_type = 4;  //ceiling
-  float celing_vertices[12] = {0,room_height,0, 0,room_height,room_breadth , room_length,room_height,room_breadth , room_length,room_height,0};
-  room[0]->quad_vertices = celing_vertices;
-  room[0]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
-  room[0]->set_color(1,0.8,0.1);
+  room[0]->obj_type = 5;  //ceiling
+  room[0]->cuboid_length = room_length;
+  room[0]->cuboid_height = room_breadth;
+  room[0]->change_parameters(0,room_height,0,90,0,0);
+  room[0]->set_color(0,1,1);
+
+  ceiling_lamp_connector = new HNode(NULL);
+  ceiling_lamp_backcover = new HNode(NULL);
+  ceiling_lamp = new HNode(NULL);
+  room[0]->add_child(ceiling_lamp_connector);
+  ceiling_lamp_connector->add_child(ceiling_lamp_backcover);
+  ceiling_lamp_connector->add_child(ceiling_lamp);
+
+  ceiling_lamp_connector->obj_type = 0;
+  ceiling_lamp_connector->base=10;
+  ceiling_lamp_connector->top=10;
+  ceiling_lamp_connector->height=20;
+  ceiling_lamp_connector->slices=4;
+  ceiling_lamp_connector->stacks=10;
+  ceiling_lamp_connector->change_parameters(room_length/2, room_height/2, 0, 0,0,0);
+  ceiling_lamp_connector->set_color(0,0,0);  
+
+  ceiling_lamp->obj_type = 0;
+  ceiling_lamp->base=10;
+  ceiling_lamp->top=30;
+  ceiling_lamp->height=20;
+  ceiling_lamp->slices=4;
+  ceiling_lamp->stacks=10;
+  ceiling_lamp->change_parameters(0,0,20,0,0,0);
+  ceiling_lamp->set_color(0.7,0.7,0.7);
+
+  ceiling_lamp_backcover->obj_type = 5;
+  ceiling_lamp_backcover->cuboid_length = 14.14;
+  ceiling_lamp_backcover->cuboid_height = 14.14;
+  ceiling_lamp_backcover->slices = 1;
+  ceiling_lamp_backcover->change_parameters(0,0,20,0,0,0);
 
 
+  
   room[1]->obj_type = 4;  //floor
-  room[1]->texMapping = 1;
-  // char file1[9] = {'f', 'l', 'o', 'o', 'r', '.', 'b', 'm', 'p'};  //"floor.bmp";
-  // room[1]->file_name = file1;
-  // room[1]->image_path = "~/Desktop/moodle/sem5/CS475M/ass2_2/CS475m_Assignment2_2/floor.bmp";
-  char imagePath[] = "./floor.bmp";
-  room[1]->image_path = imagePath;
   float floor_vertices[12] = {0,0,0, room_length,0,0, room_length,0,room_breadth, 0,0,room_breadth};
   room[1]->quad_vertices = floor_vertices;
   room[1]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
-  room[1]->set_color(1,0.8,0.1);
+  room[1]->set_color(0,0,0.2);
+  room[1]->texMapping = 1;
+  char imagePath[] = "./floor.bmp";
+  room[1]->image_path = imagePath;
 
-  room[2]->obj_type = 4;  //front
-  float front_vertices[12] = {0,0,room_breadth, room_length,0,room_breadth, room_length,room_height,room_breadth, 0,room_height,room_breadth};
-  room[2]->quad_vertices = floor_vertices;
-  room[2]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
-  room[2]->set_color(1,0.8,0.1);
+  room[2]->obj_type = 5;  //front
+  room[2]->cuboid_length = room_length;
+  room[2]->cuboid_height = room_height;
+  room[2]->slices = 20;
+  room[2]->change_parameters(0, room_height/2, room_breadth/2, 0,0,0);
+  room[2]->set_color(0,1,0);  
 
-  room[3]->obj_type = 4;  //back
-  float back_vertices[12] = {0,0,0 , 0,room_height,0 , room_length,room_height,0 , room_length,0,0};
-  room[3]->quad_vertices = back_vertices;
-  room[3]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
-  room[3]->set_color(1,0.8,0.1);
+  room[3]->obj_type = 5;  //back
+  room[3]->cuboid_length = room_length;
+  room[3]->cuboid_height = room_height;
+  room[3]->slices = 20;
+  room[3]->change_parameters(0, room_height/2, -room_breadth/2, 0,0,0);
+  room[3]->set_color(0,1,0);
 
-  //frame on back wall
-  wall_frame = new HNode(NULL);
-  wall_frame->obj_type=2;
-  wall_frame->inRadius=5;
-  wall_frame->outRadius=95;
-  wall_frame->nsides=50;
-  wall_frame->rings=4;
-  wall_frame->change_parameters(250,260,0,0,0,45);
-  wall_frame->set_color(1,0.3882,0.2784);
-  room[3]->add_child(wall_frame);
+    photoframe = new HNode(NULL);
+    room[3]->add_child(photoframe);
+    photoframe->obj_type = 2;
+    photoframe->inRadius = 3.50;
+    photoframe->outRadius = 50;
+    photoframe->nsides=10;  
+    photoframe->rings=4;
+    photoframe->change_parameters(room_length/2, room_height/2, 0, 0, 0, 45);
 
-  frame_pic = new HNode(NULL);
-  frame_pic -> obj_type=4;
-  frame_pic->texMapping=1;
-  char imagePath1[] = "./frame_pic.bmp";
-  frame_pic->image_path=imagePath1;
-  float frame_pic_vertices[12] = {-70, -70, 0.5, 70, -70, 0.5, 70, 70, 0.5, -70, 70, 0.5};
-  //float frame_pic_vertices[12] = {250, 270, 0, 260, 270,0, 260, 280, 0, 250, 280, 0};
-  frame_pic->quad_vertices = frame_pic_vertices;
-  frame_pic->change_parameters(0,0,0,-0,0,-45);
-  frame_pic->set_color(1,0,0);
-  wall_frame->add_child(frame_pic);
+    photo_in_frame = new HNode(NULL);
+    photoframe->add_child(photo_in_frame);
+    photo_in_frame->obj_type = 4;
+    float photo_in_frame_vertices[12] = {50,0,1, 0,50,1, -50,0,1, 0,-50,1};
+    photo_in_frame->quad_vertices = photo_in_frame_vertices;
+    photo_in_frame->set_color(0,0,1);
+    photo_in_frame->texMapping=1;
+    char imagePath1[] = "./frame_pic.bmp";
+    photo_in_frame->image_path=imagePath1;
 
-  room[4]->obj_type = 4;  //left
-  float left_vertices[12] = {0,0,0 , 0,0,room_breadth , 0,room_height,room_breadth , 0,room_height,0};
-  room[4]->quad_vertices = left_vertices;
-  room[4]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
-  room[4]->set_color(1,0.8,0.1);
+  room[4]->obj_type = 5;  //left
+  room[4]->cuboid_length = room_breadth;
+  room[4]->cuboid_height = room_height;
+  room[4]->slices = 20;
+  room[4]->change_parameters(-room_length/2, room_height/2,0, 0,90,0);
+  room[4]->set_color(0,1,0);
 
-  room[5]->obj_type = 4;  //right
-  float right_vertices[12] = {room_length,0,room_breadth , room_length,0,0 , room_length,room_height,0 , room_length,room_height,room_breadth};
-  room[5]->quad_vertices = right_vertices;
-  room[5]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
-  room[5]->set_color(1,0.8,0.1);
+  room[5]->obj_type = 5;  //right
+  room[5]->cuboid_length = room_breadth;
+  room[5]->cuboid_height = room_height;
+  room[5]->slices = 20;
+  room[5]->change_parameters(room_length/2,room_height/2,0,0,90,0);
+  room[5]->set_color(0,1,0);
+
+
+//headlight
+  headlight_cylinder->obj_type = 0;
+  headlight_cylinder->base=2;
+  headlight_cylinder->top=4;
+  headlight_cylinder->height=7;
+  headlight_cylinder->slices=50;
+  headlight_cylinder->stacks=10;
+  headlight_cylinder->change_preparameters(handle_connect_with_frame_length/4,0,0);
+  headlight_cylinder->change_parameters(0,0,0,0,-90,0);
+  headlight_cylinder->set_color(0.6,0.6,0.6);             //silverish color
 
 //front wheel...this is child of handle_connect_front_wheel_across!
   wheel_front->obj_type = 2;
@@ -672,9 +604,6 @@ int main(int argc, char **argv)
 
   //frame[0] = frame_upper_horizontal
   frame[0]-> obj_type=0;
-  frame[0]->texMapping=1;
-  char imagePath_frame0[] = "./stripes3.bmp";
-  frame[0]->image_path = imagePath_frame0;
   frame[0]->base=bar_radius;
   frame[0]->top=bar_radius;
   frame[0]->height=frame_upper_horizontal_len;
@@ -683,13 +612,13 @@ int main(int argc, char **argv)
   frame[0]->change_parameters(-25,40,0,-90,105,0);
   frame[0]->set_color(1,0,0);
   node[1]->add_child(frame[0]);
+  frame[0]->texMapping=1;
+  char imagePath_frame0[] = "./stripes3.bmp";
+  frame[0]->image_path = imagePath_frame0;
 
   //frame[1] = frame_lower_horizontal
   frame[1] = new HNode(NULL);
   frame[1]-> obj_type=0;
-  frame[1]->texMapping=1;
-  char imagePath_frame1[] = "./stripes3.bmp";
-  frame[1]->image_path = imagePath_frame1;
   frame[1]->base=bar_radius;
   frame[1]->top=bar_radius;
   frame[1]->height=frame_lower_horizontal_len;
@@ -697,7 +626,9 @@ int main(int argc, char **argv)
   frame[1]->stacks=10;
   frame[1]->change_parameters(-26,35,0,-90,130,0);
   frame[1]->set_color(1,0,0);
-  // node[0]->add_child(frame[1]);
+  frame[1]->texMapping=1;
+  char imagePath_frame1[] = "./stripes3.bmp";
+  frame[1]->image_path = imagePath_frame1;
 
   //frame[2] = frame_right_vertical
   frame[2] = new HNode(NULL);
@@ -709,7 +640,6 @@ int main(int argc, char **argv)
   frame[2]->stacks=10;
   frame[2]->change_parameters(17,-1,0,-90,12,0);
   frame[2]->set_color(1,0,0);
-  //node[0]->add_child(frame[2]);
 
   //frame upper right horizontal
   frame[3] = new HNode(NULL);

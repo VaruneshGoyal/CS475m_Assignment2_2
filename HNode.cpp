@@ -10,172 +10,6 @@ void vertexcopy(float *src,float *dest){
   dest[3]=src[3];
 }
 
-//image type to load the texture
-// struct Image {
-//     unsigned long sizeX;
-//     unsigned long sizeY;
-//     char *data;
-// };
-
-// typedef struct Image Image;
-
-//function to read the data from the image
-// int ImageLoad(char *filename, Image *image) {
-//     FILE *file;
-//     unsigned long size; // size of the image in bytes.
-//     unsigned long i; // standard counter.
-//     unsigned short int planes; // number of planes in image (must be 1)
-//     unsigned short int bpp; // number of bits per pixel (must be 24)
-//     char temp; // temporary color storage for bgr-rgb conversion.
-//     // make sure the file is there.
-//     if ((file = fopen(filename, "rb"))==NULL){
-//         printf("File Not Found : %s\n",filename);
-//         return 0;
-//     }
-
-//     // seek through the bmp header, up to the width/height:
-//     fseek(file, 18, SEEK_CUR);
-
-//     // read the width
-//     if ((i = fread(&image->sizeX, 4, 1, file)) != 1) {
-//         printf("Error reading width from %s.\n", filename);
-//         return 0;
-//     }
-
-//     //printf("Width of %s: %lu\n", filename, image->sizeX);
-
-//     // read the height
-//     if ((i = fread(&image->sizeY, 4, 1, file)) != 1) {
-//         printf("Error reading height from %s.\n", filename);
-//         return 0;
-//     }
-
-//     //printf("Height of %s: %lu\n", filename, image->sizeY);
-
-//     // calculate the size (assuming 24 bits or 3 bytes per pixel).
-//     size = image->sizeX * image->sizeY * 3;
-
-//     // read the planes
-//     if ((fread(&planes, 2, 1, file)) != 1) {
-//         printf("Error reading planes from %s.\n", filename);
-//         return 0;
-//     }
-
-//     if (planes != 1) {
-//         printf("Planes from %s is not 1: %u\n", filename, planes);
-//         return 0;
-//     }
-
-//     // read the bitsperpixel
-//     if ((i = fread(&bpp, 2, 1, file)) != 1) {
-//         printf("Error reading bpp from %s.\n", filename);
-//         return 0;
-//     }
-
-//     if (bpp != 24) {
-//         printf("Bpp from %s is not 24: %u\n", filename, bpp);
-//         return 0;
-//     }
-
-//     // seek past the rest of the bitmap header.
-//     fseek(file, 24, SEEK_CUR);
-
-//     // read the data.
-//     image->data = (char *) malloc(size);
-
-//     if (image->data == NULL) {
-//         printf("Error allocating memory for color-corrected image data");
-//         return 0;
-//     }
-
-//     if ((i = fread(image->data, size, 1, file)) != 1) {
-//         printf("Error reading image data from %s.\n", filename);
-//         return 0;
-//     }
-
-//     for (i=0;i<size;i+=3) { // reverse all of the colors. (bgr -> rgb)
-//         temp = image->data[i];
-//         image->data[i] = image->data[i+2];
-//         image->data[i+2] = temp;
-//     }
-
-//     //fclose(filename);
-
-//     // we're done.
-//     return 1;
-// }
-
-// //function to load the texture - return an image object
-// Image * loadTexture(char* filename1){
-//     Image *image1;
-
-//     // allocate space for texture
-//     image1 = (Image *) malloc(sizeof(Image));
-//     std::cout<<"allocated mem"<<std::endl;
-
-//     if (image1 == NULL) {
-//         printf("Error allocating space for image");
-//         exit(0);
-//     }
-
-//     //char filename1[] = {'f', 'l', 'o', 'o', 'r', '.', 'b', 'm', 'p'};
-//     bool loaded = ImageLoad(filename1, image1);
-//     std::cout<<"reached here - 1"<<std::endl;
-
-//     //if (!ImageLoad(filename1, image1)) {
-//     if (!loaded) {
-//         std::cout<<"pain in image loading"<<std::endl;
-//         exit(1);
-//     }
-//     else{
-//         std::cout<<"image loaded"<<std::endl;
-//     }
-
-//     return image1;
-// }
-
-// void HNode::texMap_init(char* filename1){
-//     //glClearColor (0, 0, 0, 1.0);
-//     // glEnable(GL_DEPTH_TEST);
-//     // glDepthFunc(GL_LESS);
-//     std::cout<<"rendering floor 1"<<std::endl;
-//     Image *image1 = loadTexture(filename1);
-//     std::cout<<"rendering floor 2"<<std::endl;
-//     if(image1 == NULL){
-//         printf("Image was not returned from loadTexture\n");
-//         exit(0);
-//     }
-
-//     // makeCheckImage();
-//     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-//     // Create Texture
-//     glGenTextures(1, &textureId);
-
-//     ////bind the newly created texture; all future texture functions will modify this tecture
-//     glBindTexture(GL_TEXTURE_2D, textureId);
-
-//     //specify the texture image
-//     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image1->sizeX, image1->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, image1->data);
-   
-//     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-//     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-//     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-//     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-
-//     // glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); //scale linearly when image bigger than texture
-//     // glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); //scale linearly when image smalled than texture
-    
-//     //specify texture environment parameters
-//     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-
-//     //enable texturing
-//     glEnable(GL_TEXTURE_2D);
-//     //select flat or smooth shading
-//     glShadeModel(GL_FLAT);
-// }
-
-/*dhruti*/
 int HNode::loadBMP_custom(const char * imagepath){
     //data read from header of bmp file
     unsigned char header[54];       //each BMP file begins with by a 54 byte header
@@ -243,7 +77,6 @@ int HNode::loadBMP_custom(const char * imagepath){
     // // glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data1);
 }
-/*dhruti*/
 
 HNode::HNode(HNode* par){
   tx = 0;
@@ -261,7 +94,7 @@ HNode::HNode(HNode* par){
     parent->add_child(this);
   }
 
-  texMapping = 0;
+    texMapping = 0;
   obj_type = -1;
   quad  = gluNewQuadric();
   base = inRadius = 0;
@@ -289,15 +122,7 @@ void HNode::render(){
   //Translate before rotation(if any)
   glTranslatef(ptx,pty,ptz);
 
-  // glEnable(GL_TEXTURE_2D);
-  // glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-
-  // if(texMapping == 1){
-    
-  // }
-
   if(obj_type == 0){
-    // glu
     if(texMapping == 1){
       loadBMP_custom(image_path);
       glEnable(GL_TEXTURE_2D);
@@ -398,14 +223,13 @@ GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
     glEnd();
   }
   else if(obj_type == 4){
-    if(texMapping == 1){
+if(texMapping == 1){
       //glBindTexture(GL_TEXTURE_2D, textureId); -- already did
       // texMap_init(file_name);
       loadBMP_custom(image_path);
       glEnable(GL_TEXTURE_2D);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D, textureId);
-
 
       glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0);
@@ -428,7 +252,29 @@ GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
       glEnd();
     }
   }
-  glutSwapBuffers();
+  else if(obj_type == 5){
+    glTranslatef(-cuboid_length/2,-cuboid_height/2,0);
+    int num = slices;
+    for (float w1 = 0; w1 < cuboid_length; w1+=cuboid_length/num)
+    {
+        for (float h1 = 0; h1 < cuboid_height; h1+=cuboid_height/num)
+        {
+            // cout << "line 328 w1 " << w1 << " h1 " << h1 << endl;
+            //glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+            //glEnable(GL_COLOR_MATERIAL);
+            glBegin(GL_QUADS);
+            glNormal3f(0,1,0);
+            glVertex3f(w1, h1, 0);
+            glNormal3f(0,1,0);
+            glVertex3f(w1, h1 + cuboid_height/num, 0);
+            glNormal3f(0,1,0);
+            glVertex3f(w1 + cuboid_length/num, h1 + cuboid_height/num, 0);
+            glNormal3f(0,1,0);
+            glVertex3f(w1 + cuboid_length/num, h1, 0);
+            glEnd();
+        }
+    }
+  }
 }
 
 void HNode::set_color(float R, float G, float B){
@@ -462,7 +308,9 @@ void HNode::render_tree(){
   // glEnd();
   glColor3f(R,G,B);
   float surface_color[] = {R,G,B};
+  float specular[] = {0.2,0.2,0.2,0};
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, surface_color); 
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
   render();
   for(int i=0;i<children.size();i++){
     children[i]->render_tree();
