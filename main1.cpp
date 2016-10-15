@@ -7,6 +7,22 @@
 
 using namespace std;
 
+//camera
+int camera_loc = 1;
+//1 = camera1 at riders eye level - default
+//2 = behind & on top - can see whole cycle
+//3 = fixed on wall - looks down in a fixed direction
+
+float a = 0;
+float b = 5.0;
+float c = 180.0;
+float d = 0.0;
+float e = 0.0;
+float f = 0.0;
+float g = 0.0;
+float h = 1.0;
+float i = 0.0;
+
 HNode *node[10];
 HNode *frame[8];
 HNode *wheel_front;
@@ -92,6 +108,60 @@ HNode *handle_connect_with_frame, *handle_connect_front_wheel_across,
   GLfloat light_ambient[] = {0.4,0.4,0.4};
   bool l0_status;
 
+//function to toggle camera
+void toggleCamera(int camera_loc){
+  if(camera_loc == 1){
+    //a = frame[0]->tx;
+    a = seat[0]->tx;
+      //b = (frame[0]->ty)+50;
+    b = seat[0]->ty + 50;
+      //c = frame[0]->tz;
+    c = seat[0]->tz;
+      //d = frame[0]->tx-15;
+    d = seat[0]->tx - 15;
+      //e = (frame[0]->ty)+50;
+    e = b;
+      //f = frame[0]->tz;
+    f = c;
+      g = 0.0;
+      h = 1.0;
+      i = 0.0;
+
+      cout<<"camera 1"<<endl;
+  }
+  else if(camera_loc == 2){
+    a = wheel_back->tx + wheel_back->outRadius + 5;
+      b = wheel_back->ty + 300;
+      c = frame[0]->tz;
+      d = wheel_front->tx - wheel_front->outRadius - 5;
+      e = wheel_front->ty - wheel_front->outRadius;
+      f = frame[0]->tz;
+      g = 1.0;
+      h = -((wheel_back->tx + wheel_back->outRadius + 5 - (wheel_front->tx - wheel_front->outRadius - 5))/((frame[0]->ty)+20 - (wheel_front->ty - wheel_front->outRadius)));
+      i = 0.0;
+
+      cout<<"camera 2"<<endl;    
+  }
+  else{
+    //camera_loc == 3
+     a = room[0]->tx+250;
+      b = room[0]->ty+250;
+      c = room[0]->tz+250;
+      d = room[0]->tx;
+      e = room[0]->ty;
+      f = room[0]->tz;
+      g = 0.5;
+      h = 0.5;
+      i = -1.0;
+
+      cout<<"camera 3"<<endl;
+  }
+  cout<<"lookat vector = ("<<(d-a)<<","<<(e-b)<<","<<(f-c)<<")"<<endl;
+  gluLookAt(a, b, c,  // eye is at (0,0,8)
+    d, e, f,      // center is at (0,0,0)
+    g, h, i);      // up is in positive Y direction
+}
+
 //Our function for processing ASCII keys
 void processNormalKeys(unsigned char key, int x, int y) {
   switch(key) {
@@ -126,6 +196,21 @@ void processNormalKeys(unsigned char key, int x, int y) {
       glutPostRedisplay();
       break;
     case 'H':
+      glutPostRedisplay();
+      break;
+    case '1':
+      camera_loc = 1;
+      toggleCamera(camera_loc);
+      glutPostRedisplay();    //only glutMainLoop() executed again; not the init() function - so no effect on camera 
+      break;
+    case '2':
+      camera_loc = 2;
+      toggleCamera(camera_loc);
+      glutPostRedisplay();
+      break;
+    case '3':
+      camera_loc = 3;
+      toggleCamera(camera_loc);
       glutPostRedisplay();
       break;
   }
