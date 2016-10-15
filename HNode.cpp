@@ -126,7 +126,7 @@ void HNode::render(){
     if(texMapping == 1){
       loadBMP_custom(image_path);
       glEnable(GL_TEXTURE_2D);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
       //control the generation of texture coordinates
       // GLfloat param1[4] = {1.0, 0.0, 0.0, 0.0};
@@ -228,7 +228,7 @@ if(texMapping == 1){
       // texMap_init(file_name);
       loadBMP_custom(image_path);
       glEnable(GL_TEXTURE_2D);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
       glBindTexture(GL_TEXTURE_2D, textureId);
 
       glBegin(GL_QUADS);

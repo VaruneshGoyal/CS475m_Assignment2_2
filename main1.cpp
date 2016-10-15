@@ -336,13 +336,11 @@ int main(int argc, char **argv)
   ceiling_lamp_backcover->slices = 1;
   ceiling_lamp_backcover->change_parameters(0,0,20,0,0,0);
 
-
-  
   room[1]->obj_type = 4;  //floor
   float floor_vertices[12] = {0,0,0, room_length,0,0, room_length,0,room_breadth, 0,0,room_breadth};
   room[1]->quad_vertices = floor_vertices;
   room[1]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
-  room[1]->set_color(0,0,0.2);
+  room[1]->set_color(1,1,1);
   room[1]->texMapping = 1;
   char imagePath[] = "./floor.bmp";
   room[1]->image_path = imagePath;
@@ -375,7 +373,7 @@ int main(int argc, char **argv)
     photo_in_frame->obj_type = 4;
     float photo_in_frame_vertices[12] = {50,0,1, 0,50,1, -50,0,1, 0,-50,1};
     photo_in_frame->quad_vertices = photo_in_frame_vertices;
-    photo_in_frame->set_color(0,0,1);
+    photo_in_frame->set_color(1,1,1);
     photo_in_frame->texMapping=1;
     char imagePath1[] = "./frame_pic.bmp";
     photo_in_frame->image_path=imagePath1;
