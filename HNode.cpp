@@ -67,66 +67,44 @@ void HNode::render(){
  
       //Front
       glNormal3f(0.0f, 0.0f, 1.0f);
-      //glNormal3f(-1.0f, 0.0f, 1.0f);
       glVertex3f(0.0f, 0.0f, cuboid_breadth);
-      //glNormal3f(1.0f, 0.0f, 1.0f);
       glVertex3f(cuboid_length, 0.0f, cuboid_breadth);
-      //glNormal3f(1.0f, 0.0f, 1.0f);
       glVertex3f(cuboid_length, cuboid_height, cuboid_breadth);
-      //glNormal3f(-1.0f, 0.0f, 1.0f);
       glVertex3f(0.0f, cuboid_height, cuboid_breadth);
    
       //Right
       glNormal3f(1, 0, 0);
       glVertex3f(cuboid_length, 0.0f, cuboid_breadth);
-      //glNormal3f(1.0f, 0.0f, -1.0f);
       glVertex3f(cuboid_length, 0, 0);
-      //glNormal3f(1.0f, 0.0f, -1.0f);
       glVertex3f(cuboid_length, cuboid_height, 0);
-      //glNormal3f(1.0f, 0.0f, 1.0f);
       glVertex3f(cuboid_length, cuboid_height, cuboid_breadth);
-      //glNormal3f(1.0f, 0.0f, 1.0f);
    
       //Back
       glNormal3f(0.0f, 0.0f, -1.0f);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(0, 0, 0);
       glVertex3f(0, cuboid_height, 0);
       glVertex3f(cuboid_length, cuboid_height, 0);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(cuboid_length, 0, 0);
    
       //Left
       glNormal3f(-1.0f, 0.0f, 0.0f);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(0.0f, 0.0f, 0.0f);
-      //glNormal3f(-1.0f, 0.0f, 1.0f);
       glVertex3f(0, 0.0f, cuboid_breadth);
-      //glNormal3f(-1.0f, 0.0f, 1.0f);
       glVertex3f(0, cuboid_height, cuboid_breadth);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(0, cuboid_height, 0);
 
       //top
       glNormal3f(0.0f, 1.0f, 0.0f);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(0, cuboid_height, 0);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(0, cuboid_height, cuboid_breadth);
-      //glNormal3f(1.0f, 0.0f, -1.0f);
       glVertex3f(cuboid_length, cuboid_height, cuboid_breadth);
-      //glNormal3f(1.0f, 0.0f, -1.0f);
       glVertex3f(cuboid_length, cuboid_height, 0);
    
       //bottom
       glNormal3f(0.0f, -1.0f, 0.0f);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(0.0f, 0.0f, 0.0f);
-      //glNormal3f(-1.0f, 0.0f, 1.0f);
       glVertex3f(cuboid_length, 0.0f, 0.0f);
-      //glNormal3f(-1.0f, 0.0f, 1.0f);
       glVertex3f(cuboid_length, 0.0f, cuboid_breadth);
-      //glNormal3f(-1.0f, 0.0f, -1.0f);
       glVertex3f(0, 0, cuboid_breadth);
  
     glEnd();
@@ -142,8 +120,13 @@ void HNode::render(){
       glVertex3f(triangle_x2, triangle_y2, tz);
     glEnd();
   }
-  else{
-    //do nothing
+  else if(obj_type == 4){
+    glBegin(GL_QUADS);
+      glVertex3f(quad_vertices[0], quad_vertices[1], quad_vertices[2]);
+      glVertex3f(quad_vertices[3], quad_vertices[4], quad_vertices[5]);
+      glVertex3f(quad_vertices[6], quad_vertices[7], quad_vertices[8]);
+      glVertex3f(quad_vertices[9], quad_vertices[10], quad_vertices[11]);
+    glEnd();
   }
 }
 
@@ -177,6 +160,8 @@ void HNode::render_tree(){
   //   glVertex3f(0,0,0);
   // glEnd();
   glColor3f(R,G,B);
+  float surface_color[] = {R,G,B};
+  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, surface_color); 
   render();
   for(int i=0;i<children.size();i++){
     children[i]->render_tree();

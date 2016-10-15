@@ -44,6 +44,7 @@ public:
   float cuboid_height, cuboid_length, cuboid_breadth;
   int obj_type;
   float triangle_x1, triangle_y1, triangle_x2, triangle_y2;
+  float* quad_vertices; //{x,y,z , x,y,z , x,y,z , x,y,z} format
 
 
   // HNode (HNode* parent, int num_vertices, float pos_v4[][4],  float col_v4[][4]);		//default constructor of the node
@@ -54,6 +55,7 @@ public:
   void change_preparameters(float ptx, float pty, float ptz);
   void render_tree();			//function to render the whole tree - this + children (NOT parents)
   void set_color(float R, float G, float B);
+  // void set_material();
   // void (*render_function)();
 
   // void make_cuboid();

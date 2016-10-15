@@ -30,12 +30,19 @@ HNode *pedal_rod_across;
 HNode *axle;
 HNode *across_gear;
 
-HNode *room;
+HNode *room[6];
 
 
 HNode *handle_connect_with_frame, *handle_connect_front_wheel_across, 
       *handle_connect_front_wheel_left, *handle_connect_front_wheel_right,
       *handlebar_connector, *handlebar_connector_across, *handlebar_left, *handlebar_right;
+
+//lighting and shading
+  GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+  GLfloat light_diffuse[] = {0.8,0.8,0.8};
+  GLfloat light_specular[] = {1,1,1};
+  GLfloat light_ambient[] = {0.4,0.4,0.4};
+
 
 //static variables
   float wheel_outer_radius = 24;
@@ -183,6 +190,8 @@ void display(void){
 void init(void){
   // Use depth buffering for hidden surface elimination.
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
   // Setup the view of the cube.
   glMatrixMode(GL_PROJECTION);
   //gluPerspective(field of view in degree, aspect ratio, Z near, Z far);
@@ -192,6 +201,12 @@ void init(void){
   gluLookAt(0.0, 5.0, 180.0,  // eye is at (0,0,8)
   0.0, 0.0, 0.0,      // center is at (0,0,0)
   0.0, 1.0, 0.0);      // up is in positive Y direction
+
+  glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+  glShadeModel (GL_SMOOTH);
 }
 
 int main(int argc, char **argv)
@@ -201,8 +216,10 @@ int main(int argc, char **argv)
   node[0] = new HNode(NULL);
   node[1] = new HNode(NULL);
   
-  room = new HNode(NULL);
-  node[0]->add_child(room);
+  for(int i=0; i<6; i++){
+    room[i] = new HNode(NULL);
+    node[0]->add_child(room[i]);
+  }
 
   wheel_axis_f = new HNode(NULL);
   wheel_axis_b = new HNode(NULL);
@@ -260,13 +277,51 @@ int main(int argc, char **argv)
   handlebar_connector_across->add_child(handlebar_left);
   handlebar_connector_across->add_child(handlebar_right);
 
+// //room
+//   room->obj_type = 1;
+  float room_height = 500;
+  float room_breadth = 500;
+  float room_length = 500;
+//   room->change_parameters(-room->cuboid_length/2, 0, -room->cuboid_breadth/2, 0,0,0);
+//   room->set_color(1,0.8,0.1);
+
 //room
-  room->obj_type = 1;
-  room->cuboid_height = 1000;
-  room->cuboid_breadth = 1000;
-  room->cuboid_length = 1000;
-  room->change_parameters(-room->cuboid_length/2, 0, -room->cuboid_breadth/2, 0,0,0);
-  room->set_color(1,0.8,0.1);
+  room[0]->obj_type = 4;  //ceiling
+  float celing_vertices[12] = {0,room_height,0, 0,room_height,room_breadth , room_length,room_height,room_breadth , room_length,room_height,0};
+  room[0]->quad_vertices = celing_vertices;
+  room[0]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
+  room[0]->set_color(1,0.8,0.1);
+
+
+  room[1]->obj_type = 4;  //floor
+  float floor_vertices[12] = {0,0,0, room_length,0,0, room_length,0,room_breadth, 0,0,room_breadth};
+  room[1]->quad_vertices = floor_vertices;
+  room[1]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
+  room[1]->set_color(1,0.8,0.1);
+
+  room[2]->obj_type = 4;  //front
+  float front_vertices[12] = {0,0,room_breadth, room_length,0,room_breadth, room_length,room_height,room_breadth, 0,room_height,room_breadth};
+  room[2]->quad_vertices = floor_vertices;
+  room[2]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
+  room[2]->set_color(1,0.8,0.1);
+
+  room[3]->obj_type = 4;  //back
+  float back_vertices[12] = {0,0,0 , 0,room_height,0 , room_length,room_height,0 , room_length,0,0};
+  room[3]->quad_vertices = back_vertices;
+  room[3]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
+  room[3]->set_color(1,0.8,0.1);
+
+  room[4]->obj_type = 4;  //left
+  float left_vertices[12] = {0,0,0 , 0,0,room_breadth , 0,room_height,room_breadth , 0,room_height,0};
+  room[4]->quad_vertices = left_vertices;
+  room[4]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
+  room[4]->set_color(1,0.8,0.1);
+
+  room[5]->obj_type = 4;  //right
+  float right_vertices[12] = {room_length,0,room_breadth , room_length,0,0 , room_length,room_height,0 , room_length,room_height,room_breadth};
+  room[5]->quad_vertices = right_vertices;
+  room[5]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
+  room[5]->set_color(1,0.8,0.1);
 
 //front wheel...this is child of handle_connect_front_wheel_across!
   wheel_front->obj_type = 2;

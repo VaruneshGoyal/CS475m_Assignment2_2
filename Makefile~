@@ -7,7 +7,7 @@ BIN = main1
 all	:	$(BIN)
 
 $(BIN)	:	HNode.hpp HNode.cpp $(SRC) 
-	$(CC) $(SRC) HNode.cpp -o $(BIN) $(LIBS) -std=c++11
+	$(CC) $(SRC) HNode.cpp -o $(BIN) $(LIBS)
 
 clean	:
 	rm -f $(BIN) *~ *.aux *.log
