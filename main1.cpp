@@ -7,6 +7,128 @@
 
 using namespace std;
 
+//texture id
+//GLuint texture;
+
+// //image type to load the texture
+// struct Image {
+//     unsigned long sizeX;
+//     unsigned long sizeY;
+//     char *data;
+// };
+
+// typedef struct Image Image;
+
+// //function to read the data from the image
+// int ImageLoad(char *filename, Image *image) {
+//     FILE *file;
+//     unsigned long size; // size of the image in bytes.
+//     unsigned long i; // standard counter.
+//     unsigned short int planes; // number of planes in image (must be 1)
+//     unsigned short int bpp; // number of bits per pixel (must be 24)
+//     char temp; // temporary color storage for bgr-rgb conversion.
+//     // make sure the file is there.
+//     if ((file = fopen(filename, "rb"))==NULL){
+//         printf("File Not Found : %s\n",filename);
+//         return 0;
+//     }
+
+//     // seek through the bmp header, up to the width/height:
+//     fseek(file, 18, SEEK_CUR);
+
+//     // read the width
+//     if ((i = fread(&image->sizeX, 4, 1, file)) != 1) {
+//         printf("Error reading width from %s.\n", filename);
+//         return 0;
+//     }
+
+//     //printf("Width of %s: %lu\n", filename, image->sizeX);
+
+//     // read the height
+//     if ((i = fread(&image->sizeY, 4, 1, file)) != 1) {
+//         printf("Error reading height from %s.\n", filename);
+//         return 0;
+//     }
+
+//     //printf("Height of %s: %lu\n", filename, image->sizeY);
+
+//     // calculate the size (assuming 24 bits or 3 bytes per pixel).
+//     size = image->sizeX * image->sizeY * 3;
+
+//     // read the planes
+//     if ((fread(&planes, 2, 1, file)) != 1) {
+//         printf("Error reading planes from %s.\n", filename);
+//         return 0;
+//     }
+
+//     if (planes != 1) {
+//         printf("Planes from %s is not 1: %u\n", filename, planes);
+//         return 0;
+//     }
+
+//     // read the bitsperpixel
+//     if ((i = fread(&bpp, 2, 1, file)) != 1) {
+//         printf("Error reading bpp from %s.\n", filename);
+//         return 0;
+//     }
+
+//     if (bpp != 24) {
+//         printf("Bpp from %s is not 24: %u\n", filename, bpp);
+//         return 0;
+//     }
+
+//     // seek past the rest of the bitmap header.
+//     fseek(file, 24, SEEK_CUR);
+
+//     // read the data.
+//     image->data = (char *) malloc(size);
+
+//     if (image->data == NULL) {
+//         printf("Error allocating memory for color-corrected image data");
+//         return 0;
+//     }
+
+//     if ((i = fread(image->data, size, 1, file)) != 1) {
+//         printf("Error reading image data from %s.\n", filename);
+//         return 0;
+//     }
+
+//     for (i=0;i<size;i+=3) { // reverse all of the colors. (bgr -> rgb)
+//         temp = image->data[i];
+//         image->data[i] = image->data[i+2];
+//         image->data[i+2] = temp;
+//     }
+
+//     //fclose(filename);
+
+//     // we're done.
+//     return 1;
+// }
+
+// //function to load the texture - return an image object
+// Image * loadTexture(){
+//     Image *image1;
+
+//     // allocate space for texture
+//     image1 = (Image *) malloc(sizeof(Image));
+
+//     if (image1 == NULL) {
+//         printf("Error allocating space for image");
+//         exit(0);
+//     }
+
+//     char filename1[] = {'f', 'l', 'o', 'o', 'r', '.', 'b', 'm', 'p'};
+
+//     if (!ImageLoad(filename1, image1)) {
+//         cout<<"pain in image loading"<<endl;
+//         exit(1);
+//     }
+//     else{
+//         cout<<"image loaded"<<endl;
+//     }
+
+//     return image1;
+// }
 
 HNode *node[10];
 HNode *frame[8];
@@ -31,7 +153,8 @@ HNode *axle;
 HNode *across_gear;
 
 HNode *room[6];
-
+HNode *wall_frame;
+HNode *frame_pic;
 
 HNode *handle_connect_with_frame, *handle_connect_front_wheel_across, 
       *handle_connect_front_wheel_left, *handle_connect_front_wheel_right,
@@ -42,7 +165,6 @@ HNode *handle_connect_with_frame, *handle_connect_front_wheel_across,
   GLfloat light_diffuse[] = {0.8,0.8,0.8};
   GLfloat light_specular[] = {1,1,1};
   GLfloat light_ambient[] = {0.4,0.4,0.4};
-
 
 //static variables
   float wheel_outer_radius = 24;
@@ -294,6 +416,12 @@ int main(int argc, char **argv)
 
 
   room[1]->obj_type = 4;  //floor
+  room[1]->texMapping = 1;
+  // char file1[9] = {'f', 'l', 'o', 'o', 'r', '.', 'b', 'm', 'p'};  //"floor.bmp";
+  // room[1]->file_name = file1;
+  // room[1]->image_path = "~/Desktop/moodle/sem5/CS475M/ass2_2/CS475m_Assignment2_2/floor.bmp";
+  char imagePath[] = "./floor.bmp";
+  room[1]->image_path = imagePath;
   float floor_vertices[12] = {0,0,0, room_length,0,0, room_length,0,room_breadth, 0,0,room_breadth};
   room[1]->quad_vertices = floor_vertices;
   room[1]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
@@ -310,6 +438,29 @@ int main(int argc, char **argv)
   room[3]->quad_vertices = back_vertices;
   room[3]->change_parameters(-room_length/2, 0, -room_breadth/2, 0,0,0);
   room[3]->set_color(1,0.8,0.1);
+
+  //frame on back wall
+  wall_frame = new HNode(NULL);
+  wall_frame->obj_type=2;
+  wall_frame->inRadius=5;
+  wall_frame->outRadius=95;
+  wall_frame->nsides=50;
+  wall_frame->rings=4;
+  wall_frame->change_parameters(250,260,0,0,0,45);
+  wall_frame->set_color(1,0.3882,0.2784);
+  room[3]->add_child(wall_frame);
+
+  frame_pic = new HNode(NULL);
+  frame_pic -> obj_type=4;
+  frame_pic->texMapping=1;
+  char imagePath1[] = "./frame_pic.bmp";
+  frame_pic->image_path=imagePath1;
+  float frame_pic_vertices[12] = {-70, -70, 0.5, 70, -70, 0.5, 70, 70, 0.5, -70, 70, 0.5};
+  //float frame_pic_vertices[12] = {250, 270, 0, 260, 270,0, 260, 280, 0, 250, 280, 0};
+  frame_pic->quad_vertices = frame_pic_vertices;
+  frame_pic->change_parameters(0,0,0,-0,0,-45);
+  frame_pic->set_color(1,0,0);
+  wall_frame->add_child(frame_pic);
 
   room[4]->obj_type = 4;  //left
   float left_vertices[12] = {0,0,0 , 0,0,room_breadth , 0,room_height,room_breadth , 0,room_height,0};
@@ -521,6 +672,9 @@ int main(int argc, char **argv)
 
   //frame[0] = frame_upper_horizontal
   frame[0]-> obj_type=0;
+  frame[0]->texMapping=1;
+  char imagePath_frame0[] = "./stripes3.bmp";
+  frame[0]->image_path = imagePath_frame0;
   frame[0]->base=bar_radius;
   frame[0]->top=bar_radius;
   frame[0]->height=frame_upper_horizontal_len;
@@ -533,6 +687,9 @@ int main(int argc, char **argv)
   //frame[1] = frame_lower_horizontal
   frame[1] = new HNode(NULL);
   frame[1]-> obj_type=0;
+  frame[1]->texMapping=1;
+  char imagePath_frame1[] = "./stripes3.bmp";
+  frame[1]->image_path = imagePath_frame1;
   frame[1]->base=bar_radius;
   frame[1]->top=bar_radius;
   frame[1]->height=frame_lower_horizontal_len;
