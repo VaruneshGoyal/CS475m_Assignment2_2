@@ -32,19 +32,20 @@ public:
   float R,G,B;
   
   GLUquadric* quad;
-  GLdouble base;
-  GLdouble inRadius;
-  GLdouble top;
-  GLdouble outRadius;
-  GLdouble height;
+  double base;
+  double inRadius;
+  double top;
+  double outRadius;
+  // GLdouble height;
   GLint slices;
   GLint nsides;
   GLint stacks;
   GLint rings;
-  float cuboid_height, cuboid_length, cuboid_breadth;
+  double height, length, breadth;
   int obj_type;
   float triangle_x1, triangle_y1, triangle_x2, triangle_y2;
   float* quad_vertices; //{x,y,z , x,y,z , x,y,z , x,y,z} format
+  double matrix[16];
 
   bool texMapping;  //1 => texture mapping present
   GLuint textureId;  //will be generated - we dont have to create explicitly
@@ -68,19 +69,6 @@ public:
 
   int loadBMP_custom(const char * imagepath);
   
-  //increment/decrement parameters
-  void inc_rx();
-  void inc_ry();
-  void inc_rz();
-  void dec_rx();
-  void dec_ry();
-  void dec_rz();
-  void dec_ty();
-  void inc_tx();
-  void inc_ty();
-  void dec_tx();
-  void inc_tz();
-  void dec_tz();
 };
 
 #endif

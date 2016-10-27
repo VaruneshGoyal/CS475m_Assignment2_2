@@ -104,7 +104,7 @@ HNode::HNode(HNode* par){
   nsides = 0;
   stacks = 10;
   rings = 0;
-  cuboid_height = cuboid_length = cuboid_breadth = 0;
+  height = length = breadth = 0;
   triangle_x1, triangle_y1, triangle_x2, triangle_y2 = 0;
 }
 
@@ -133,8 +133,8 @@ void HNode::render(){
       // GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
 
       /*
-GLfloat param1[4] = {1.0, 0.0, 0.0, 0.0};
-GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
+    GLfloat param1[4] = {1.0, 0.0, 0.0, 0.0};
+    GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
       */
 
       // glEnable(GL_TEXTURE_GEN_S);
@@ -157,6 +157,7 @@ GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
       gluCylinder(quad, base, top, height, slices, stacks);
     }
   }
+
   else if(obj_type == 1){
     //cuboid
 
@@ -169,52 +170,54 @@ GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
  
       //Front
       glNormal3f(0.0f, 0.0f, 1.0f);
-      glVertex3f(0.0f, 0.0f, cuboid_breadth);
-      glVertex3f(cuboid_length, 0.0f, cuboid_breadth);
-      glVertex3f(cuboid_length, cuboid_height, cuboid_breadth);
-      glVertex3f(0.0f, cuboid_height, cuboid_breadth);
+      glVertex3f(0.0f, 0.0f, breadth);
+      glVertex3f(length, 0.0f, breadth);
+      glVertex3f(length, height, breadth);
+      glVertex3f(0.0f, height, breadth);
    
       //Right
       glNormal3f(1, 0, 0);
-      glVertex3f(cuboid_length, 0.0f, cuboid_breadth);
-      glVertex3f(cuboid_length, 0, 0);
-      glVertex3f(cuboid_length, cuboid_height, 0);
-      glVertex3f(cuboid_length, cuboid_height, cuboid_breadth);
+      glVertex3f(length, 0.0f, breadth);
+      glVertex3f(length, 0, 0);
+      glVertex3f(length, height, 0);
+      glVertex3f(length, height, breadth);
    
       //Back
       glNormal3f(0.0f, 0.0f, -1.0f);
       glVertex3f(0, 0, 0);
-      glVertex3f(0, cuboid_height, 0);
-      glVertex3f(cuboid_length, cuboid_height, 0);
-      glVertex3f(cuboid_length, 0, 0);
+      glVertex3f(0, height, 0);
+      glVertex3f(length, height, 0);
+      glVertex3f(length, 0, 0);
    
       //Left
       glNormal3f(-1.0f, 0.0f, 0.0f);
       glVertex3f(0.0f, 0.0f, 0.0f);
-      glVertex3f(0, 0.0f, cuboid_breadth);
-      glVertex3f(0, cuboid_height, cuboid_breadth);
-      glVertex3f(0, cuboid_height, 0);
+      glVertex3f(0, 0.0f, breadth);
+      glVertex3f(0, height, breadth);
+      glVertex3f(0, height, 0);
 
       //top
       glNormal3f(0.0f, 1.0f, 0.0f);
-      glVertex3f(0, cuboid_height, 0);
-      glVertex3f(0, cuboid_height, cuboid_breadth);
-      glVertex3f(cuboid_length, cuboid_height, cuboid_breadth);
-      glVertex3f(cuboid_length, cuboid_height, 0);
+      glVertex3f(0, height, 0);
+      glVertex3f(0, height, breadth);
+      glVertex3f(length, height, breadth);
+      glVertex3f(length, height, 0);
    
       //bottom
       glNormal3f(0.0f, -1.0f, 0.0f);
       glVertex3f(0.0f, 0.0f, 0.0f);
-      glVertex3f(cuboid_length, 0.0f, 0.0f);
-      glVertex3f(cuboid_length, 0.0f, cuboid_breadth);
-      glVertex3f(0, 0, cuboid_breadth);
+      glVertex3f(length, 0.0f, 0.0f);
+      glVertex3f(length, 0.0f, breadth);
+      glVertex3f(0, 0, breadth);
  
     glEnd();
     glFlush();
   }
+
   else if(obj_type == 2){
     glutSolidTorus(inRadius, outRadius, nsides, rings);
   }
+
   else if(obj_type == 3){
     glBegin(GL_TRIANGLES);
       glVertex3f(tx, ty, tz);
@@ -222,8 +225,9 @@ GLfloat param2[4] = {0.0, 0.0, 1.0, 0.0};
       glVertex3f(triangle_x2, triangle_y2, tz);
     glEnd();
   }
+
   else if(obj_type == 4){
-if(texMapping == 1){
+    if(texMapping == 1){
       //glBindTexture(GL_TEXTURE_2D, textureId); -- already did
       // texMap_init(file_name);
       loadBMP_custom(image_path);
@@ -252,12 +256,13 @@ if(texMapping == 1){
       glEnd();
     }
   }
-  else if(obj_type == 5){
-    glTranslatef(-cuboid_length/2,-cuboid_height/2,0);
+
+  else if(obj_type == 5){       //sliced quadrilateral (for shading)
+    glTranslatef(-length/2,-height/2,0);
     int num = slices;
-    for (float w1 = 0; w1 < cuboid_length; w1+=cuboid_length/num)
+    for (float w1 = 0; w1 < length; w1+=length/num)
     {
-        for (float h1 = 0; h1 < cuboid_height; h1+=cuboid_height/num)
+        for (float h1 = 0; h1 < height; h1+=height/num)
         {
             // cout << "line 328 w1 " << w1 << " h1 " << h1 << endl;
             //glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -266,14 +271,21 @@ if(texMapping == 1){
             glNormal3f(0,1,0);
             glVertex3f(w1, h1, 0);
             glNormal3f(0,1,0);
-            glVertex3f(w1, h1 + cuboid_height/num, 0);
+            glVertex3f(w1, h1 + height/num, 0);
             glNormal3f(0,1,0);
-            glVertex3f(w1 + cuboid_length/num, h1 + cuboid_height/num, 0);
+            glVertex3f(w1 + length/num, h1 + height/num, 0);
             glNormal3f(0,1,0);
-            glVertex3f(w1 + cuboid_length/num, h1, 0);
+            glVertex3f(w1 + length/num, h1, 0);
             glEnd();
         }
     }
+  }
+
+  else if(obj_type == 6){   //light1
+    GLfloat light_pos[] = {0,0,0,1};
+    glLightfv(GL_LIGHT1, GL_POSITION, light_pos);
+    GLfloat spot_direction[] = {0,0,1};
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
   }
 }
 
@@ -316,59 +328,4 @@ void HNode::render_tree(){
     children[i]->render_tree();
   }
   glPopMatrix();
-}
-
-void HNode::inc_rx(){
-  rx++;
-  if(rx>360)
-  rx-=360;
-}
-void HNode::inc_ry(){
-  ry++;
-  if(ry>360)
-  ry-=360;
-}
-void HNode::inc_rz(){
-  rz++;
-  if(rz>360)
-  rz-=360;
-}
-void HNode::dec_rx(){
-  rx--;
-  if(rx<0)
-  rx+=360;
-}
-void HNode::dec_ry(){
-  ry--;
-  if(ry<0)
-  ry+=360;
-}
-void HNode::dec_rz(){
-  rz--;
-  if(rz<0)
-  rz+=360;
-}
-
-void HNode::dec_ty(){
-  ty--;
-}
-
-void HNode::inc_tx(){
-  tx++;
-}
-
-void HNode::inc_ty(){
-  ty++;
-}
-
-void HNode::dec_tx(){
-  tx--;
-}
-
-void HNode::inc_tz(){
-  tz++;
-}
-
-void HNode::dec_tz(){
-  tz--;
 }

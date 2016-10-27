@@ -7,12 +7,6 @@
 
 using namespace std;
 
-//camera
-int camera_loc = 1;
-//1 = camera1 at riders eye level - default
-//2 = behind & on top - can see whole cycle
-//3 = fixed on wall - looks down in a fixed direction
-
 float a = 0;
 float b = 5.0;
 float c = 180.0;
@@ -50,6 +44,8 @@ HNode *headlight_cylinder;
 HNode *ceiling_lamp_connector;
 HNode *ceiling_lamp;
 HNode *ceiling_lamp_backcover;
+
+HNode *spotlight;
 
 HNode *room[6];
 
@@ -101,119 +97,71 @@ HNode *handle_connect_with_frame, *handle_connect_front_wheel_across,
   float delta_x, delta_l, l=80.0;
   float theta, theta_f, theta_f2;
 
+  int camera = 1;
+
 //lighting and shading
-  GLfloat light_position[] = { room_length/2, room_height-30, 0, 1};
-  GLfloat light_diffuse[] = {0.8,0.8,0.8};
-  GLfloat light_specular[] = {1,1,1};
-  GLfloat light_ambient[] = {0.4,0.4,0.4};
+  GLfloat light0_position[] = { room_length/2, room_height-30, 0, 1};
+  GLfloat light0_diffuse[] = {0.8,0.8,0.8};
+  GLfloat light0_specular[] = {1,1,1};
+  GLfloat light0_ambient[] = {0.4,0.4,0.4};
   bool l0_status;
-
-//function to toggle camera
-void toggleCamera(int camera_loc){
-  if(camera_loc == 1){
-    //a = frame[0]->tx;
-    a = seat[0]->tx;
-      //b = (frame[0]->ty)+50;
-    b = seat[0]->ty + 50;
-      //c = frame[0]->tz;
-    c = seat[0]->tz;
-      //d = frame[0]->tx-15;
-    d = seat[0]->tx - 15;
-      //e = (frame[0]->ty)+50;
-    e = b;
-      //f = frame[0]->tz;
-    f = c;
-      g = 0.0;
-      h = 1.0;
-      i = 0.0;
-
-      cout<<"camera 1"<<endl;
-  }
-  else if(camera_loc == 2){
-    a = wheel_back->tx + wheel_back->outRadius + 5;
-      b = wheel_back->ty + 300;
-      c = frame[0]->tz;
-      d = wheel_front->tx - wheel_front->outRadius - 5;
-      e = wheel_front->ty - wheel_front->outRadius;
-      f = frame[0]->tz;
-      g = 1.0;
-      h = -((wheel_back->tx + wheel_back->outRadius + 5 - (wheel_front->tx - wheel_front->outRadius - 5))/((frame[0]->ty)+20 - (wheel_front->ty - wheel_front->outRadius)));
-      i = 0.0;
-
-      cout<<"camera 2"<<endl;    
-  }
-  else{
-    //camera_loc == 3
-     a = room[0]->tx+250;
-      b = room[0]->ty+250;
-      c = room[0]->tz+250;
-      d = room[0]->tx;
-      e = room[0]->ty;
-      f = room[0]->tz;
-      g = 0.5;
-      h = 0.5;
-      i = -1.0;
-
-      cout<<"camera 3"<<endl;
-  }
-  cout<<"lookat vector = ("<<(d-a)<<","<<(e-b)<<","<<(f-c)<<")"<<endl;
-  gluLookAt(a, b, c,  // eye is at (0,0,8)
-    d, e, f,      // center is at (0,0,0)
-    g, h, i);      // up is in positive Y direction
-}
+  //GLfloat light1_position[] = { room_length/2, room_height-30, 0, 1};
+  GLfloat light1_position[] = { 0,0, 0, 1};
+  GLfloat light1_diffuse[] = {0.8,0.8,0.8};
+  GLfloat light1_specular[] = {1,1,1};
+  GLfloat light1_ambient[] = {0.4,0.4,0.4};
+  GLfloat spot_direction[] = { -1.0, -1.0, 0.0 };
+  bool l1_status;
 
 //Our function for processing ASCII keys
 void processNormalKeys(unsigned char key, int x, int y) {
   switch(key) {
     case 'X':
       glRotatef(1,1,0,0);
-      glutPostRedisplay();
       break;
     case 'Y':
       glRotatef(1,0,1,0);
-      glutPostRedisplay();
       break;      
     case 'Z':
       glRotatef(1,0,0,1);
-      glutPostRedisplay();
       break;     
     case 'x':
       glRotatef(1,-1,0,0);
-      glutPostRedisplay();
       break;
     case 'y':
       glRotatef(1,0,-1,0);
-      glutPostRedisplay();
       break;      
     case 'z':
       glRotatef(1,0,0,-1);
-      glutPostRedisplay();
       break;    
     case 'L':
       if(l0_status) glDisable(GL_LIGHT0);
       else glEnable(GL_LIGHT0);
       l0_status = !l0_status;
-      glutPostRedisplay();
       break;
     case 'H':
-      glutPostRedisplay();
+      if(l1_status) glDisable(GL_LIGHT1);
+      else glEnable(GL_LIGHT1);
+      l1_status = !l1_status;
       break;
     case '1':
-      camera_loc = 1;
-      toggleCamera(camera_loc);
-      glutPostRedisplay();    //only glutMainLoop() executed again; not the init() function - so no effect on camera 
+      camera = 1;
       break;
     case '2':
-      camera_loc = 2;
-      toggleCamera(camera_loc);
-      glutPostRedisplay();
+      camera = 2;
+      // gluLookAt(0,0,0,
+      //           0,0,1,
+      //           0,1,0);
       break;
     case '3':
-      camera_loc = 3;
-      toggleCamera(camera_loc);
-      glutPostRedisplay();
+      camera = 3;
+      //glLoadMatrixd(camera3->matrix);
+            // gluLookAt(0,room_height/2,room_breadth/2,
+            //     0,0,0,
+            //     0,1,0);
       break;
   }
+  glutPostRedisplay();
   if (key == 27)
   exit(0);
 }
@@ -244,7 +192,7 @@ void processSpecialKeys(int key, int x, int y) {
 
       gear[0]->rz+= 6.5/4;
       pedal_cuboid[0]->change_parameters(0,1,0,0,45+gear[0]->rz,0);
-      pedal_cuboid[1]->change_parameters(0,-pedal_cuboid[1]->cuboid_height - 1,0,0,45+gear[0]->rz,0);
+      pedal_cuboid[1]->change_parameters(0,-pedal_cuboid[1]->height - 1,0,0,45+gear[0]->rz,0);
       // cout<<(delta_x/wheel_outer_radius)*180/3.1415<<endl;
       // cout<<delta_x<<" "<<theta<<" "<<theta_f<<" "<<theta_f2<<endl;
       // std::cout<<wheel_front->tx<<" "<<wheel_front->ty<<" "<<wheel_front->tz<<endl;
@@ -266,7 +214,7 @@ void processSpecialKeys(int key, int x, int y) {
 
       gear[0]->rz-= 6.5/4;
       pedal_cuboid[0]->change_parameters(0,1,0,0,45+gear[0]->rz,0);
-      pedal_cuboid[1]->change_parameters(0,-pedal_cuboid[1]->cuboid_height - 1,0,0,45+gear[0]->rz,0);
+      pedal_cuboid[1]->change_parameters(0,-pedal_cuboid[1]->height - 1,0,0,45+gear[0]->rz,0);
       // std::cout<<wheel_front->tx<<" "<<wheel_front->ty<<" "<<wheel_front->tz<<endl;
       break;
 
@@ -287,6 +235,24 @@ void processSpecialKeys(int key, int x, int y) {
 void display(void){
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+
+  if(camera==1){
+    gluLookAt(wheel_axis_b->tx,100,wheel_axis_b->tz,
+              wheel_axis_b->tx - 10*cos(wheel_axis_b->ry*3.1415/180),100,wheel_axis_b->tz + 10*sin(wheel_axis_b->ry*3.1415/180),
+              0,1,0);
+  }
+  else if(camera==2){
+    gluLookAt(wheel_axis_b->tx + 50*cos(wheel_axis_b->ry*3.1415/180),150,wheel_axis_b->tz - 50*sin(wheel_axis_b->ry*3.1415/180),
+              wheel_axis_b->tx - 10*cos(wheel_axis_b->ry*3.1415/180),100,wheel_axis_b->tz + 10*sin(wheel_axis_b->ry*3.1415/180),
+              0,1,0);
+  }
+  else{
+    gluLookAt(room_length/2 - 50, room_height-50, room_breadth/2 - 50,
+              0,0,0,
+              0,1,0);
+  }
+
   node[0]->render_tree();
   glutSwapBuffers();
 }
@@ -296,20 +262,28 @@ void init(void){
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT1);
   // Setup the view of the cube.
   glMatrixMode(GL_PROJECTION);
   //gluPerspective(field of view in degree, aspect ratio, Z near, Z far);
   gluPerspective(80.0, 1.0, 1.0, 1000.0);
 
   glMatrixMode(GL_MODELVIEW);
-  gluLookAt(0, room_height/2, 180.0,  // eye is at (0,0,8)
-  0.0, room_height/2, 0.0,      // center is at (0,0,0)
-  0.0, 1.0, 0.0);      // up is in positive Y direction
+  gluLookAt(0, room_height/2, 180.0,  // eye is at (0,0,0)
+            0.0, room_height/2, 0.0,      // center is at (0,0,0)
+            0.0, 1.0, 0.0);      // up is in positive Y direction
 
-  glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-  glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+  glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
+  glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+
+  glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 30.0);
+
   glShadeModel (GL_SMOOTH);
 }
 
@@ -385,8 +359,8 @@ int main(int argc, char **argv)
 
 //room
   room[0]->obj_type = 5;  //ceiling
-  room[0]->cuboid_length = room_length;
-  room[0]->cuboid_height = room_breadth;
+  room[0]->length = room_length;
+  room[0]->height = room_breadth;
   room[0]->change_parameters(0,room_height,0,90,0,0);
   room[0]->set_color(0,1,1);
 
@@ -416,8 +390,8 @@ int main(int argc, char **argv)
   ceiling_lamp->set_color(0.7,0.7,0.7);
 
   ceiling_lamp_backcover->obj_type = 5;
-  ceiling_lamp_backcover->cuboid_length = 14.14;
-  ceiling_lamp_backcover->cuboid_height = 14.14;
+  ceiling_lamp_backcover->length = 14.14;
+  ceiling_lamp_backcover->height = 14.14;
   ceiling_lamp_backcover->slices = 1;
   ceiling_lamp_backcover->change_parameters(0,0,20,0,0,0);
 
@@ -431,15 +405,15 @@ int main(int argc, char **argv)
   room[1]->image_path = imagePath;
 
   room[2]->obj_type = 5;  //front
-  room[2]->cuboid_length = room_length;
-  room[2]->cuboid_height = room_height;
+  room[2]->length = room_length;
+  room[2]->height = room_height;
   room[2]->slices = 20;
   room[2]->change_parameters(0, room_height/2, room_breadth/2, 0,0,0);
   room[2]->set_color(0,1,0);  
 
   room[3]->obj_type = 5;  //back
-  room[3]->cuboid_length = room_length;
-  room[3]->cuboid_height = room_height;
+  room[3]->length = room_length;
+  room[3]->height = room_height;
   room[3]->slices = 20;
   room[3]->change_parameters(0, room_height/2, -room_breadth/2, 0,0,0);
   room[3]->set_color(0,1,0);
@@ -464,19 +438,18 @@ int main(int argc, char **argv)
     photo_in_frame->image_path=imagePath1;
 
   room[4]->obj_type = 5;  //left
-  room[4]->cuboid_length = room_breadth;
-  room[4]->cuboid_height = room_height;
+  room[4]->length = room_breadth;
+  room[4]->height = room_height;
   room[4]->slices = 20;
   room[4]->change_parameters(-room_length/2, room_height/2,0, 0,90,0);
   room[4]->set_color(0,1,0);
 
   room[5]->obj_type = 5;  //right
-  room[5]->cuboid_length = room_breadth;
-  room[5]->cuboid_height = room_height;
+  room[5]->length = room_breadth;
+  room[5]->height = room_height;
   room[5]->slices = 20;
   room[5]->change_parameters(room_length/2,room_height/2,0,0,90,0);
   room[5]->set_color(0,1,0);
-
 
 //headlight
   headlight_cylinder->obj_type = 0;
@@ -488,6 +461,11 @@ int main(int argc, char **argv)
   headlight_cylinder->change_preparameters(handle_connect_with_frame_length/4,0,0);
   headlight_cylinder->change_parameters(0,0,0,0,-90,0);
   headlight_cylinder->set_color(0.6,0.6,0.6);             //silverish color
+
+  //spotlight
+  spotlight = new HNode(NULL);
+  headlight_cylinder->add_child(spotlight);
+  spotlight->obj_type = 6;
 
 //front wheel...this is child of handle_connect_front_wheel_across!
   wheel_front->obj_type = 2;
@@ -682,7 +660,6 @@ int main(int argc, char **argv)
   handle_connect_front_wheel_right->change_parameters(0,0,0,90,0,0);
   handle_connect_front_wheel_right->set_color(0.5,0.5,0.5);
 
-
 /********the main frame****************/
 
   //frame[0] = frame_upper_horizontal
@@ -861,22 +838,22 @@ int main(int argc, char **argv)
   //pedal cuboids
   pedal_cuboid[0] = new HNode(NULL);
   pedal_cuboid[0]->obj_type=1;
-  pedal_cuboid[0]->cuboid_breadth=7;
-  pedal_cuboid[0]->cuboid_height=4;
-  pedal_cuboid[0]->cuboid_length=3.5;
+  pedal_cuboid[0]->breadth=7;
+  pedal_cuboid[0]->height=4;
+  pedal_cuboid[0]->length=3.5;
   pedal_cuboid[0]->set_color(0.3,0.3,0.3);
-  pedal_cuboid[0]->change_preparameters(-pedal_cuboid[0]->cuboid_length/2,0,-pedal_cuboid[0]->cuboid_breadth/2);
+  pedal_cuboid[0]->change_preparameters(-pedal_cuboid[0]->length/2,0,-pedal_cuboid[0]->breadth/2);
   pedal_cuboid[0]->change_parameters(0,1,0,0,45-gear[0]->rz,0);  //1 is pedal_rod radius
   pedal_rod[0]->add_child(pedal_cuboid[0]);       //backside pedal
 
   pedal_cuboid[1] = new HNode(NULL);
   pedal_cuboid[1]->obj_type=1;
-  pedal_cuboid[1]->cuboid_breadth=7;
-  pedal_cuboid[1]->cuboid_height=4;
-  pedal_cuboid[1]->cuboid_length=3.5;
+  pedal_cuboid[1]->breadth=7;
+  pedal_cuboid[1]->height=4;
+  pedal_cuboid[1]->length=3.5;
   pedal_cuboid[1]->set_color(0.3,0.3,0.3);
-  pedal_cuboid[1]->change_preparameters(-pedal_cuboid[1]->cuboid_length/2,0,-pedal_cuboid[1]->cuboid_breadth/2);
-  pedal_cuboid[1]->change_parameters(0,-pedal_cuboid[1]->cuboid_height - 1,0,0,45-gear[0]->rz,0);
+  pedal_cuboid[1]->change_preparameters(-pedal_cuboid[1]->length/2,0,-pedal_cuboid[1]->breadth/2);
+  pedal_cuboid[1]->change_parameters(0,-pedal_cuboid[1]->height - 1,0,0,45-gear[0]->rz,0);
   pedal_rod[1]->add_child(pedal_cuboid[1]);       //frontside pedal
 
   // //rod across gear
